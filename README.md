@@ -3,19 +3,6 @@
 A simple script to monitor CPU and RAM usage on Linux systems and log the data to a file.  
 Includes a **systemd service** to run the monitor automatically in the background.
 
----
-
-## Table of Contents
-
-- [Features](#features)
-- [Installation](#installation)
-- [Usage](#usage)
-- [Systemd Service](#systemd-service)
-- [Logs](#logs)
-- [Requirements](#requirements)
-- [License](#license)
-
----
 
 ## Features
 
