@@ -62,4 +62,4 @@ Systemd (if running as a service)
 
 ## **License**
 
-Open-source project – free to use and modif
+Open-source project – free to use and modify.
