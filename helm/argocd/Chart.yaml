@@ -1,0 +1,6 @@
+apiVersion: v2
+name: argo-cd
+description: Helm chart for deploying Argo CD
+version: 0.1.0
+appVersion: "2.9.12"   # adjust to latest Argo CD version
+
