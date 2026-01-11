@@ -1,0 +1,19 @@
+replicaCount: 2
+
+image:
+  repository: node-backend
+  tag: latest
+  pullPolicy: Never
+
+service:
+  type: ClusterIP
+  port: 80
+
+ingress:
+  enabled: true
+  hosts:
+    - host: backend.local
+      paths:
+        - path: /
+          pathType: Prefix
+

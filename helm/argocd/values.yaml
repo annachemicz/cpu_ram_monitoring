@@ -1,0 +1,21 @@
+server:
+  service:
+    type: LoadBalancer  # or NodePort for local clusters
+    port: 80
+
+controller:
+  replicas: 1
+
+repoServer:
+  resources:
+    requests:
+      cpu: 100m
+      memory: 128Mi
+    limits:
+      cpu: 500m
+      memory: 256Mi
+
+configs:
+  cm:
+    application.instanceLabelKey: argocd.argoproj.io/instance
+
