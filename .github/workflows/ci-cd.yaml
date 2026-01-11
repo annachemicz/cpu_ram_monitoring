@@ -1,0 +1,72 @@
+name: CI/CD Pipeline
+
+on:
+  push:
+    branches: [ "main" ]
+  pull_request:
+
+env:
+  REGISTRY: ghcr.io
+  IMAGE_NAME: ${{ github.repository }}
+
+jobs:
+  build-test-lint:
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout z GitHub
+        uses: actions/checkout@v4
+
+      - name: Setup Docker Buildx
+        uses: docker/setup-buildx-action@v3
+
+      # ===== TESTY =====
+      - name: Testy (pytest)
+        run: |
+          pip install -r requirements.txt
+          pytest
+
+      # ===== LINTING =====
+      - name: Linting (flake8)
+        run: |
+          pip install flake8
+          flake8 .
+
+      # ===== BUILD =====
+      - name: Logowanie do registry
+        uses: docker/login-action@v3
+        with:
+          registry: ${{ env.REGISTRY }}
+          username: ${{ github.actor }}
+          password: ${{ secrets.GITHUB_TOKEN }}
+
+      - name: Build obrazu Dockera
+        run: |
+          docker build -t $REGISTRY/$IMAGE_NAME:${{ github.sha }} .
+
+      - name: Push do registry
+        run: |
+          docker push $REGISTRY/$IMAGE_NAME:${{ github.sha }}
+
+  deploy-prod:
+    needs: build-test-lint
+    runs-on: ubuntu-latest
+
+    # 🔒 Manual approval
+    environment:
+      name: production
+      url: https://twoja-aplikacja.example.com
+
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Setup kubectl
+        uses: azure/setup-kubectl@v4
+        with:
+          version: v1.29.0
+
+      - name: Deploy na Kubernetes
+        run: |
+          kubectl apply -f k8s/
+
