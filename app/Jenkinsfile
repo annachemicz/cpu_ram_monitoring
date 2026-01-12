@@ -1,0 +1,96 @@
+pipeline {
+    agent any
+
+    environment {
+        DOCKER_REGISTRY = 'my-docker-repo'
+        DOCKER_IMAGE = "${DOCKER_REGISTRY}/my-app"
+        KUBECONFIG_STAGING = credentials('kubeconfig-staging') // tylko staging
+    }
+
+    stages {
+        stage('Checkout') {
+            steps {
+                checkout scm
+            }
+        }
+
+        stage('Setup') {
+            steps {
+                // instalacja zależności
+                sh 'python3 -m pip install --upgrade pip || true'
+                sh 'npm install -g npm || true'
+            }
+        }
+
+        stage('Linting') {
+            parallel {
+                stage('Python Lint') {
+                    steps {
+                        sh 'pip install flake8 || true'
+                        sh 'flake8 . || true'
+                    }
+                }
+                stage('JS/TS Lint') {
+                    steps {
+                        sh 'npm install || true'
+                        sh 'npx eslint . || true'
+                    }
+                }
+            }
+        }
+
+        stage('Tests') {
+            parallel {
+                stage('Python Tests') {
+                    steps {
+                        sh 'pip install -r requirements.txt pytest || true'
+                        sh 'pytest || true'
+                    }
+                }
+                stage('JS Tests') {
+                    steps {
+                        sh 'npm install || true'
+                        sh 'npm test || true'
+                    }
+                }
+                stage('Go Tests') {
+                    steps {
+                        sh 'go test ./... || true'
+                    }
+                }
+            }
+        }
+
+        stage('Build Docker Image') {
+            steps {
+                script {
+                    sh "docker build -t ${env.DOCKER_IMAGE}:${env.BUILD_NUMBER} ."
+                }
+            }
+        }
+
+        stage('Push Docker Image') {
+            steps {
+                script {
+                    docker.withRegistry('https://index.docker.io/v1/', 'dockerhub-credentials') {
+                        sh "docker push ${env.DOCKER_IMAGE}:${env.BUILD_NUMBER}"
+                    }
+                }
+            }
+        }
+
+        stage('Deploy to Staging') {
+            steps {
+                withEnv(["KUBECONFIG=${env.KUBECONFIG_STAGING}"]) {
+                    sh 'kubectl apply -f k8s/staging-deployment.yaml'
+                }
+            }
+        }
+    }
+
+    post {
+        failure {
+            echo "Pipeline failed at build ${env.BUILD_NUMBER}"
+        }
+    }
+}

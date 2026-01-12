@@ -1,0 +1,14 @@
+{
+  "name": "frontend",
+  "version": "1.0.0",
+  "main": "index.js",
+  "scripts": {
+    "test": "jest",
+    "lint": "eslint ."
+  },
+  "devDependencies": {
+    "jest": "^29.7.0",
+    "eslint": "^8.50.0"
+  }
+}
+
