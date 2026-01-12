@@ -1,0 +1,20 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: cpu-ram-monitoring-prod
+spec:
+  replicas: 2
+  selector:
+    matchLabels:
+      app: cpu-ram-monitoring
+  template:
+    metadata:
+      labels:
+        app: cpu-ram-monitoring
+    spec:
+      containers:
+      - name: cpu-ram-monitoring
+        image: docker.io/annachemicz/cpu-ram-monitoring:latest
+        ports:
+        - containerPort: 8080
+
