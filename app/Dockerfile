@@ -3,7 +3,7 @@ FROM golang:1.21-alpine AS builder
 WORKDIR /app
 COPY app/go.mod app/go.sum ./
 RUN go mod download
-COPY app/ .
+COPY . .
 RUN go build -o cpu-ram-monitoring
 
 # ===== Stage 2: Final image =====
