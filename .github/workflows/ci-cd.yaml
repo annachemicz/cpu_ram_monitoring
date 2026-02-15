@@ -17,22 +17,28 @@ jobs:
       - name: Checkout z GitHub
         uses: actions/checkout@v4
 
-      - name: Setup Docker Buildx
-        uses: docker/setup-buildx-action@v3
-
-      # ===== TESTY =====
+      # ===== PYTHON TESTS =====
       - name: Testy (pytest)
+        working-directory: app/python_app
         run: |
           pip install -r requirements.txt
           pytest
 
-      # ===== LINTING =====
+      # ===== PYTHON LINT =====
       - name: Linting (flake8)
+        working-directory: app/python_app
         run: |
           pip install flake8
           flake8 .
 
-      # ===== BUILD =====
+      # ===== NODE LINT =====
+      - name: Linting JS/TS (eslint)
+        working-directory: app
+        run: |
+          npm install
+          npx eslint .
+
+      # ===== DOCKER =====
       - name: Logowanie do registry
         uses: docker/login-action@v3
         with:
@@ -41,6 +47,7 @@ jobs:
           password: ${{ secrets.GITHUB_TOKEN }}
 
       - name: Build obrazu Dockera
+        working-directory: app
         run: |
           docker build -t $REGISTRY/$IMAGE_NAME:${{ github.sha }} .
 
@@ -52,7 +59,6 @@ jobs:
     needs: build-test-lint
     runs-on: ubuntu-latest
 
-    # 🔒 Manual approval
     environment:
       name: production
       url: https://twoja-aplikacja.example.com
@@ -69,4 +75,3 @@ jobs:
       - name: Deploy na Kubernetes
         run: |
           kubectl apply -f k8s/
-
