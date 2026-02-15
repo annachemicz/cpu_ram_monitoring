@@ -1,4 +1,4 @@
-\# ===== Stage 1: Build Go app =====
+# ===== Stage 1: Build Go app =====
 FROM golang:1.21-alpine AS builder
 WORKDIR /app
 
