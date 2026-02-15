@@ -18,7 +18,7 @@ COPY frontend/ ./frontend
 
 # Skopiuj Python app
 COPY python_app/ ./python_app
-COPY requirements.txt .
+COPY python_app/requirements.txt .
 
 # Zainstaluj Python dependencies
 RUN pip install --no-cache-dir -r requirements.txt
@@ -26,6 +26,5 @@ RUN pip install --no-cache-dir -r requirements.txt
 # Expose port
 EXPOSE 8080
 
-# Start command (np. Go app)
 CMD ["./cpu-ram-monitoring"]
 
