@@ -1,0 +1,60 @@
+{% extends "base.html" %}
+{% block title %}Jadłospis - Dieta App{% endblock %}
+{% block content %}
+<h1>Jadłospis na {{ selected_days }} dni</h1>
+<p class="muted">Cel dzienny: <strong>{{ calc.target_calories }} kcal</strong></p>
+
+<form method="post" action="{{ url_for('main.generuj_jadlospis') }}" class="inline-form">
+    <select name="num_days">
+        {% for days in plan_length_options %}
+            <option value="{{ days }}" {% if days == selected_days %}selected{% endif %}>
+                {{ plan_length_labels[days] }}
+            </option>
+        {% endfor %}
+    </select>
+    <button type="submit" class="btn-primary">🔄 Wygeneruj jadłospis</button>
+</form>
+
+{% if error %}
+    <div class="card">
+        <p class="warning">Nie udało się ułożyć pełnego jadłospisu - brakuje przepisów (po wykluczeniu alergenów) dla:
+        {{ missing_slots | map('capitalize') | join(', ') }}. Zmień listę alergii w profilu lub dodaj więcej przepisów.</p>
+    </div>
+{% elif plan %}
+    <p class="muted">Plan zaczyna się dzisiaj i jest ułożony pod Twój obecny cel kaloryczny
+        (przy dłuższym planie warto go co jakiś czas przeliczyć na nowo, gdy zmieni się Twoja waga).</p>
+    <div class="table-scroll">
+        <table class="plan-table">
+            <thead>
+                <tr>
+                    <th>Data</th>
+                    <th>Śniadanie</th>
+                    <th>Obiad</th>
+                    <th>Kolacja</th>
+                    <th>Przekąska</th>
+                    <th>kcal</th>
+                </tr>
+            </thead>
+            <tbody>
+                {% for day in plan %}
+                    <tr>
+                        <td class="plan-date">{{ day.date }}<br><span class="muted">{{ day.day_name }}</span></td>
+                        {% for slot in ["sniadanie", "obiad", "kolacja", "przekaska"] %}
+                            <td>
+                                {% if slot in day.meals %}
+                                    {{ day.meals[slot].name }}
+                                    <br><span class="muted">{{ day.meals[slot].calories }} kcal</span>
+                                {% else %}
+                                    <span class="muted">-</span>
+                                {% endif %}
+                            </td>
+                        {% endfor %}
+                        <td><strong>{{ day.total_calories }}</strong></td>
+                    </tr>
+                {% endfor %}
+            </tbody>
+        </table>
+    </div>
+    <p><a href="{{ url_for('main.lista_zakupow') }}" class="btn-secondary">🛒 Zobacz listę zakupów</a></p>
+{% endif %}
+{% endblock %}

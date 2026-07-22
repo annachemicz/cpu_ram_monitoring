@@ -1,0 +1,64 @@
+[
+  {
+    "date": "2026-07-17",
+    "slots": {
+      "sniadanie": 100,
+      "obiad": 132,
+      "kolacja": 148
+    }
+  },
+  {
+    "date": "2026-07-18",
+    "slots": {
+      "sniadanie": 101,
+      "obiad": 125,
+      "kolacja": 147,
+      "przekaska": 61
+    }
+  },
+  {
+    "date": "2026-07-19",
+    "slots": {
+      "sniadanie": 105,
+      "obiad": 24,
+      "kolacja": 140,
+      "przekaska": 163
+    }
+  },
+  {
+    "date": "2026-07-20",
+    "slots": {
+      "sniadanie": 1,
+      "obiad": 127,
+      "kolacja": 153,
+      "przekaska": 63
+    }
+  },
+  {
+    "date": "2026-07-21",
+    "slots": {
+      "sniadanie": 101,
+      "obiad": 128,
+      "kolacja": 44,
+      "przekaska": 161
+    }
+  },
+  {
+    "date": "2026-07-22",
+    "slots": {
+      "sniadanie": 4,
+      "obiad": 132,
+      "kolacja": 142,
+      "przekaska": 166
+    }
+  },
+  {
+    "date": "2026-07-23",
+    "slots": {
+      "sniadanie": 9,
+      "obiad": 22,
+      "kolacja": 148,
+      "przekaska": 60
+    }
+  }
+]

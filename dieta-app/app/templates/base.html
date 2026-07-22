@@ -1,0 +1,37 @@
+<!DOCTYPE html>
+<html lang="pl">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>{% block title %}Dieta App{% endblock %}</title>
+    <link rel="stylesheet" href="{{ url_for('static', filename='style.css') }}">
+</head>
+<body>
+    <header class="topbar">
+        <div class="topbar-inner">
+            <a class="brand" href="{{ url_for('main.jadlospis') }}">🥗 Dieta App</a>
+            <nav>
+                <a href="{{ url_for('main.profil') }}">Profil</a>
+                <a href="{{ url_for('main.przepisy') }}">Przepisy</a>
+                <a href="{{ url_for('main.jadlospis') }}">Jadłospis</a>
+                <a href="{{ url_for('main.lista_zakupow') }}">Lista zakupów</a>
+                <a href="{{ url_for('main.postepy') }}">Postępy</a>
+            </nav>
+        </div>
+    </header>
+
+    <main class="container">
+        {% with messages = get_flashed_messages(with_categories=true) %}
+            {% if messages %}
+                {% for category, message in messages %}
+                    <div class="flash flash-{{ category }}">{{ message }}</div>
+                {% endfor %}
+            {% endif %}
+        {% endwith %}
+
+        {% block content %}{% endblock %}
+    </main>
+
+    <footer class="footer">Dieta App &middot; działa lokalnie, dane zapisywane tylko na tym urządzeniu</footer>
+</body>
+</html>

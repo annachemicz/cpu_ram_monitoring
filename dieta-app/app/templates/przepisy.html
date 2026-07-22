@@ -1,0 +1,46 @@
+{% extends "base.html" %}
+{% block title %}Przepisy - Dieta App{% endblock %}
+{% block content %}
+<h1>Przepisy</h1>
+<p class="muted">Przepisy zawierające Twoje alergeny są automatycznie ukryte na podstawie profilu.</p>
+
+<div class="filter-bar">
+    <a class="filter-chip {% if method_filter == 'wszystkie' %}active{% endif %}" href="{{ url_for('main.przepisy') }}">Wszystkie</a>
+    {% for key, label in method_labels.items() %}
+        <a class="filter-chip {% if method_filter == key %}active{% endif %}"
+           href="{{ url_for('main.przepisy', method=key) }}">{{ label }}</a>
+    {% endfor %}
+</div>
+
+<div class="recipe-grid">
+    {% for r in recipes %}
+        <div class="card recipe-card">
+            <h3>{{ r.name }}</h3>
+            <p class="tags">
+                <span class="tag">{{ method_labels[r.method] }}</span>
+                <span class="tag">{{ meal_type_labels[r.meal_type] }}</span>
+            </p>
+            <p class="macros">
+                <strong>{{ r.calories }} kcal</strong> &middot;
+                B: {{ r.protein_g }}g &middot; T: {{ r.fat_g }}g &middot; W: {{ r.carbs_g }}g
+            </p>
+            {% if r.allergens %}
+                <p class="allergen-badges">
+                    {% for a in r.allergens %}<span class="badge">{{ allergen_labels[a] }}</span>{% endfor %}
+                </p>
+            {% endif %}
+            <details>
+                <summary>Składniki i przygotowanie</summary>
+                <ul>
+                    {% for ing in r.ingredients %}
+                        <li>{{ ing.quantity }} {{ ing.unit }} - {{ ing.name }}</li>
+                    {% endfor %}
+                </ul>
+                <p>{{ r.instructions }}</p>
+            </details>
+        </div>
+    {% else %}
+        <p>Brak przepisów spełniających kryteria (sprawdź listę alergenów w profilu).</p>
+    {% endfor %}
+</div>
+{% endblock %}
