@@ -1,0 +1,45 @@
+{% extends "base.html" %}
+{% block title %}Lista zakupów - Dieta App{% endblock %}
+{% block content %}
+<h1>Lista zakupów na {{ num_days }} dni</h1>
+<p class="muted">Zsumowane składniki ze wszystkich przepisów z bieżącego jadłospisu, pogrupowane wg kategorii.
+    {% if num_days > 30 %}Przy tak długim okresie to sumaryczne zapotrzebowanie na cały plan - warto kupować
+    produkty (zwłaszcza świeże) partiami, a nie od razu na wszystkie {{ num_days }} dni.{% endif %}</p>
+
+<form method="post" action="{{ url_for('main.aktualizuj_lista_zakupow') }}">
+    <div class="shopping-actions">
+        <label class="checkbox-item">
+            <input type="checkbox" name="hide_owned" value="1" {% if hide_owned %}checked{% endif %}>
+            Ukryj produkty, które już mam
+        </label>
+    </div>
+
+    <div class="shopping-grid">
+        {% for category, items in shopping_list.items() %}
+            <div class="card shopping-category">
+                <h3>{{ category | capitalize }}</h3>
+                <ul class="shopping-list">
+                    {% for item in items %}
+                        {% set item_key = item.name ~ '||' ~ item.unit %}
+                        <li>
+                            <label class="shopping-item">
+                                <input type="checkbox" name="owned_item" value="{{ item_key }}"
+                                    {% if item_key in owned_items %}checked{% endif %}>
+                                <span>{{ item.name }} - {{ item.quantity }} {{ item.unit }}</span>
+                            </label>
+                        </li>
+                    {% endfor %}
+                </ul>
+            </div>
+        {% endfor %}
+    </div>
+    <div class="shopping-actions">
+        <button type="submit" class="btn-primary">Zapisz posiadane produkty</button>
+    </div>
+</form>
+
+<div class="card">
+    <p class="muted">Odznaczone produkty zostaną uznane za nieposiadane i pojawią się na liście zakupów.
+        Zaznaczenie opcji "Ukryj produkty, które już mam" odświeży widok, aby skupić się tylko na brakujących zakupach.</p>
+</div>
+{% endblock %}

@@ -1,0 +1,107 @@
+{% extends "base.html" %}
+{% block title %}Profil - Dieta App{% endblock %}
+{% block content %}
+<h1>Twój profil</h1>
+<p class="muted">Uzupełnij dane, aby aplikacja policzyła Twoje dzienne zapotrzebowanie kaloryczne pod redukcję wagi
+    i wykluczyła składniki, na które jesteś uczulony/a.</p>
+
+<div class="card summary-card">
+    <h2>Twój dzienny cel kaloryczny</h2>
+    <p class="big-number">{{ calc.target_calories }} kcal / dzień</p>
+    <p class="muted">
+        BMR: {{ calc.bmr }} kcal &middot; CPM (TDEE): {{ calc.tdee }} kcal &middot; deficyt: {{ calc.deficit }} kcal
+    </p>
+    {% if calc.capped %}
+        <p class="warning">Uwaga: obliczony deficyt zszedłby poniżej bezpiecznego minimum kalorii,
+            więc cel został podniesiony do bezpiecznego poziomu.</p>
+    {% endif %}
+</div>
+
+<form method="post" class="card form">
+    <h2>Dane</h2>
+    <div class="form-row">
+        <label for="sex">Płeć</label>
+        <select name="sex" id="sex">
+            <option value="kobieta" {% if profile.sex == "kobieta" %}selected{% endif %}>Kobieta</option>
+            <option value="mezczyzna" {% if profile.sex == "mezczyzna" %}selected{% endif %}>Mężczyzna</option>
+        </select>
+    </div>
+    <div class="form-row">
+        <label for="weight_kg">Waga (kg)</label>
+        <input type="number" step="0.1" min="30" max="300" name="weight_kg" id="weight_kg" value="{{ profile.weight_kg }}" required>
+    </div>
+    <div class="form-row">
+        <label for="height_cm">Wzrost (cm)</label>
+        <input type="number" step="0.1" min="100" max="250" name="height_cm" id="height_cm" value="{{ profile.height_cm }}" required>
+    </div>
+    <div class="form-row">
+        <label for="age">Wiek</label>
+        <input type="number" min="10" max="100" name="age" id="age" value="{{ profile.age }}" required>
+    </div>
+    <div class="form-row">
+        <label for="activity">Aktywność fizyczna</label>
+        <select name="activity" id="activity">
+            {% for key, label in activity_labels.items() %}
+                <option value="{{ key }}" {% if profile.activity == key %}selected{% endif %}>{{ label }}</option>
+            {% endfor %}
+        </select>
+    </div>
+    <div class="form-row">
+        <label for="weekly_pace_kg">Tempo chudnięcia</label>
+        <select name="weekly_pace_kg" id="weekly_pace_kg">
+            {% for pace in pace_options %}
+                <option value="{{ pace }}" {% if profile.weekly_pace_kg == pace %}selected{% endif %}>
+                    {{ pace }} kg / tydzień
+                </option>
+            {% endfor %}
+        </select>
+    </div>
+    <div class="form-row">
+        <label for="goal_weight_kg">Waga docelowa (kg) <span class="muted">- opcjonalnie</span></label>
+        <input type="number" step="0.1" min="30" max="300" name="goal_weight_kg" id="goal_weight_kg"
+               value="{{ profile.goal_weight_kg if profile.goal_weight_kg is not none else '' }}"
+               placeholder="np. 62">
+    </div>
+
+    <h2>Alergie i nietolerancje</h2>
+    <p class="muted">Zaznaczone składniki będą całkowicie wykluczone z przepisów, jadłospisu i listy zakupów.</p>
+    <div class="checkbox-grid">
+        {% for key, label in allergen_labels.items() %}
+            <label class="checkbox-item">
+                <input type="checkbox" name="allergies" value="{{ key }}"
+                    {% if key in profile.allergies %}checked{% endif %}>
+                {{ label }}
+            </label>
+        {% endfor %}
+    </div>
+
+    <button type="submit" class="btn-primary">Zapisz profil</button>
+</form>
+
+<div class="card">
+    <h2>Wykluczone składniki</h2>
+    <p class="muted">Poza standardowymi alergenami możesz wykluczyć dowolny konkretny składnik
+        (np. konkretne warzywo, na które reagujesz) - zniknie ze wszystkich przepisów, jadłospisu i listy zakupów.</p>
+
+    {% if profile.excluded_ingredients %}
+        <div class="chip-list">
+            {% for ingredient in profile.excluded_ingredients %}
+                <span class="chip">
+                    {{ ingredient }}
+                    <form method="post" action="{{ url_for('main.usun_wykluczony_skladnik') }}" class="chip-remove-form">
+                        <input type="hidden" name="ingredient" value="{{ ingredient }}">
+                        <button type="submit" class="chip-remove" title="Usuń">×</button>
+                    </form>
+                </span>
+            {% endfor %}
+        </div>
+    {% else %}
+        <p class="muted">Brak wykluczonych składników.</p>
+    {% endif %}
+
+    <form method="post" action="{{ url_for('main.dodaj_wykluczony_skladnik') }}" class="inline-form">
+        <input type="text" name="ingredient" placeholder="np. ogórek zielony" required>
+        <button type="submit" class="btn-secondary">Dodaj</button>
+    </form>
+</div>
+{% endblock %}
